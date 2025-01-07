@@ -107,6 +107,8 @@ class ESP32BLEPinpadComponent : public Component, public BLEServiceComponent {
 
   CallbackManager<void()> state_callback_{};
   CallbackManager<void(std::string)> user_selected_callback_;
+  CallbackManager<void(std::string)> user_command_callback_;
+
 
 
   ESPPreferenceObject hotp_counter_;
