@@ -16,9 +16,10 @@ CONF_SECURITY_MODE = "security_mode"
 CONF_SECRET_PASSCODE = "secret_passcode"
 CONF_ON_PINPAD_ACCEPTED = "on_pinpad_accepted"
 CONF_ON_PINPAD_REJECTED = "on_pinpad_rejected"
+CONF_ON_USER_COMMAND = "on_user_command_received"
 CONF_ON_USER_SELECTED = "on_user_selected"
-CONF_ON_USER_COMMAND = "on_user_command"
-
+CONF_START_ADVERTISING = "start_advertising"
+CONF_STOP_ADVERTISING = "stop_advertising"
 SECURITY_MODE_NONE = "none"
 SECURITY_MODE_HOTP = "hotp"
 SECURITY_MODE_TOTP = "totp"
@@ -54,6 +55,9 @@ PinpadAcceptedTrigger = esp32_ble_pinpad_ns.class_("PinpadAcceptedTrigger", auto
 PinpadRejectedTrigger = esp32_ble_pinpad_ns.class_("PinpadRejectedTrigger", automation.Trigger.template())
 PinpadUserSelectedTrigger = esp32_ble_pinpad_ns.class_("PinpadUserSelectedTrigger", automation.Trigger.template())
 PinpadUserCommandTrigger = esp32_ble_pinpad_ns.class_("PinpadUserCommandTrigger", automation.Trigger.template())
+# Define actions for start_advertising and stop_advertising
+StartAdvertisingAction = esp32_ble_pinpad_ns.class_("StartAdvertisingAction", automation.Action)
+StopAdvertisingAction = esp32_ble_pinpad_ns.class_("StopAdvertisingAction", automation.Action)
 
 CONFIG_SCHEMA = cv.Schema(
     {
@@ -82,9 +86,37 @@ CONFIG_SCHEMA = cv.Schema(
             }
         ),        
         cv.Optional(CONF_STATUS_INDICATOR): cv.use_id(output.BinaryOutput),
+        cv.Optional(CONF_START_ADVERTISING, default=True): cv.boolean,  # Add this line
+        cv.Optional(CONF_STOP_ADVERTISING, default=False): cv.boolean,  # Add this line
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
+@automation.register_action(
+    "esp32_ble_pinpad.start_advertising",
+    StartAdvertisingAction,
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.use_id(ESP32BLEPinpadComponent),
+        }
+    ),
+)
+async def start_advertising_to_code(config, action_id, template_arg, args):
+    parent = await cg.get_variable(config[CONF_ID])
+    return cg.new_Pvariable(action_id, template_arg, parent)
+
+@automation.register_action(
+    "esp32_ble_pinpad.stop_advertising",
+    StopAdvertisingAction,
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.use_id(ESP32BLEPinpadComponent),
+        }
+    ),
+)
+async def stop_advertising_to_code(config, action_id, template_arg, args):
+    parent = await cg.get_variable(config[CONF_ID])
+    return cg.new_Pvariable(action_id, template_arg, parent)
+    
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
@@ -117,3 +149,5 @@ async def to_code(config):
     if CONF_STATUS_INDICATOR in config:
         status_indicator = await cg.get_variable(config[CONF_STATUS_INDICATOR])
         cg.add(var.set_status_indicator(status_indicator))
+        
+ 

@@ -59,8 +59,12 @@ class ESP32BLEPinpadComponent : public Component, public BLEServiceComponent {
 
   float get_setup_priority() const override;
   void start() override;
+ 
   void stop() override; 
-
+ 
+  void start_advertising();
+  void stop_advertising();
+  esp32_ble_server::BLEServer *get_ble_client() const;
 
   // Setup code.
   void set_security_mode(SecurityMode mode, const std::string &secret_passcode);
