@@ -329,7 +329,7 @@ void ESP32BLEPinpadComponent::start_advertising() {
 
 void ESP32BLEPinpadComponent::stop_advertising() {
     if (this->service_ && this->service_->is_running()) {
-        esp32_ble::global_ble->advertising_stop();
+        this->service_->stop();
         ESP_LOGD(TAG, "BLE advertising stopped.");
     } else {
         ESP_LOGW(TAG, "Cannot stop advertising: BLE service is not running.");
