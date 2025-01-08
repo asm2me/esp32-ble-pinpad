@@ -320,8 +320,9 @@ void ESP32BLEPinpadComponent::set_user_commands(const std::string &commands) {
 } 
 void ESP32BLEPinpadComponent::start_advertising() {
     if (this->service_ && this->service_->is_running()) {
-        esp32_ble::global_ble->advertising_start();
         esp32_ble::global_ble->enable();
+        esp32_ble::global_ble->advertising_start();
+        
         ESP_LOGD(TAG, "BLE advertising started.");
     } else {
         ESP_LOGW(TAG, "Cannot start advertising: BLE service is not running.");
